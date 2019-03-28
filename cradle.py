@@ -1,5 +1,5 @@
-def GetChar:
-    look = input()
+def GetChar():
+    look = input('Please input an expression: ')
 
 def Error(string):
     print
@@ -11,7 +11,7 @@ def Abort(string):
     quit()
     
 def Expected(string):
-    Abors(string + ' Expected')
+    Abort(string + ' Expected')
 
 def Match(ch):
     if look == ch:
@@ -19,14 +19,14 @@ def Match(ch):
     else:
         Expected('\'' + ch + '\'')
         
-def GetNum:
+def GetNum():
     if not look.isnumeric():
         Expected('Integer')
     ret_val = look
     GetChar()
     return ret_val
     
-def GetName:
+def GetName():
     if not look.isalpha():
         Expected('Name')
     ret_val = look
@@ -39,24 +39,24 @@ def Emit(string):
 def EmitLn(string):
     print('\t' + string)
     
-def Add:
+def Add():
     Match('+')
     Term()
     EmitLn('ADD D1,D0')
     
-def Subtract:
+def Subtract():
     Match('-')
     Term()
     EmitLn('SUB D1,D0')
     
-def init:
+def start():
     GetChar()
 
-def Term:
+def Term():
     EmitLn('MOVE #' + GetNum() + ',D0')
 
-def expression:
-    Term
+def expression():
+    Term()
     EmitLn('MOVE D0,D1')
     if look == '+':
         Add()
@@ -64,13 +64,11 @@ def expression:
         Subtract()
 
 def main():
-    """Test skeleton for python programming
-    devised by jdh69@paran.com
 
-    """
-    init
-    expression
-    
+    start()
+    expression()
+    return 0
+
 if __name__ == "__main__":
     # Try reading several files varying the buffer size
     import sys
@@ -83,11 +81,20 @@ if __name__ == "__main__":
     
     look = ''
     
-    first_arg = int(sys.argv[1])
-    other_args  = sys.argv[2:]
-    print('First arg = ' + first_arg)
-    print('Other args = ')
-    for x in other_args:
-        print(x)
-        
-    sys.exit(main())
+    if len(sys.argv) == 1:
+        pass
+    elif len(sys.argv) == 2:
+        first_arg = int(sys.argv[1])
+        print('First arg = ' + first_arg)
+    else:
+        first_arg = sys.argv[1]
+        print('First arg = ' + first_arg)
+        other_args  = sys.argv[2:]
+        print('Other args = ')
+        for x in other_args:
+            print(x)
+    
+    print('Here comes the main routine')
+    ret_val = main()
+    
+    sys.exit(ret_val)

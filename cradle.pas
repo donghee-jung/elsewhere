@@ -32,14 +32,14 @@ end; { Abort }
 
 procedure Expected(s: string);
 begin 
-	Abort(s + 'Expected');
+	Abort(s + ' Expected');
 end;
 {-----------------------------------------------------}
 
 procedure Match(x: char);
 begin
 	if Look = x then GetChar
-	else Expected(''' + x + ''');
+	else Expected('''' + x + '''');
 end;
 {-----------------------------------------------------}
 	
@@ -129,58 +129,3 @@ begin
    Expression;
 end.
 {-----------------------------------------------------} 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
