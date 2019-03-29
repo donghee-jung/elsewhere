@@ -1,40 +1,75 @@
+# Let's make a compoler using python
+# step by step from pascal version
+# python v3 source file
+# cradle.py
+def read_char(prompt):
+    str_buffer = input(prompt)
+    str_len = len(str_buffer)
+    idx = 0
+    
+    while True:
+        while idx < str_len:
+            yield str_buffer[idx]
+            idx += 1
+        str_buffer = input(prompt)
+        str_len = len(str_buffer)
+        idx = 0
+    print("** generator ends **")
+
+    
+def windowsBell():
+    winsound.Beep(500, 300)
+
+    
+def macosBell():
+    print('\a')
+
+    
+def linuxBell():
+    print('\a')
+    
+
 def GetChar():
-    look = input('Please input an expression: ')
+    global Look    
+    Look = next(char_gen)
+    
 
 def Error(string):
     print
-    winsound.Beep(500, 300)
+    EmitBell()
     print('Error: ' + string + '.')
+
 
 def Abort(string):
     Error(string)
     quit()
+
     
 def Expected(string):
     Abort(string + ' Expected')
 
 def Match(ch):
-    if look == ch:
+    if Look == ch:
         GetChar()
     else:
         Expected('\'' + ch + '\'')
         
 def GetNum():
-    if not look.isnumeric():
+    if not Look.isnumeric():
         Expected('Integer')
-    ret_val = look
+    ret_val = Look
     GetChar()
     return ret_val
     
 def GetName():
-    if not look.isalpha():
+    if not Look.isalpha():
         Expected('Name')
-    ret_val = look
+    ret_val = Look
     GetChar()
     return ret_val.upper()
     
 def Emit(string):
-    print('\t' + string, end='')
+    print('\t' + string, end = '')
 
 def EmitLn(string):
     print('\t' + string)
@@ -58,9 +93,9 @@ def Term():
 def expression():
     Term()
     EmitLn('MOVE D0,D1')
-    if look == '+':
+    if Look == '+':
         Add()
-    elif look == '-':
+    elif Look == '-':
         Subtract()
 
 def main():
@@ -69,6 +104,11 @@ def main():
     expression()
     return 0
 
+
+# Global variable
+# Look character for parser
+Look = ''
+char_gen = read_char("Enter any string: ")
 if __name__ == "__main__":
     # Try reading several files varying the buffer size
     import sys
@@ -76,10 +116,11 @@ if __name__ == "__main__":
     os = sys.platform
     if os == 'win32':
         import winsound
+        EmitBell = windowsBell
     elif os == 'linux':
-        pass
-    
-    look = ''
+        EmitBell = linuxBell
+    elif os == 'darwin':
+        EmitBell = macosBell
     
     if len(sys.argv) == 1:
         pass
