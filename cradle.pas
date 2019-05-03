@@ -12,6 +12,7 @@ CR = ^J;          { Linux & BSD }
 { Variable Declarations }
 var
 Look: char;       { Lookahead Character }
+Table: Array['A'..'Z'] of integer;
 {--------------------------------------------------------------}
 
 { Read New Character From Input Stream }
@@ -59,6 +60,12 @@ begin
    IsDigit := c in ['0'..'9'];
 end;
 {--------------------------------------------------------------}
+{ Recognize an Addop }
+function IsAddop(c: char): boolean;
+begin
+   IsAddop := c in ['+', '-'];
+end;
+{--------------------------------------------------------------}
 { Get an Identifier }
 function GetName: char;
 begin
@@ -69,10 +76,15 @@ end;
 {--------------------------------------------------------------}
 { Get a Number }
 function GetNum: integer;
+var Value: integer;
 begin
+   Value := 0;
    if not IsDigit(Look) then Expected('Integer');
-   GetNum := Ord(Look) - Ord('0');
-   GetChar;
+   while IsDigit(Look) do begin
+      Value := 10 * Value + Ord(Look) - Ord('0');
+      GetChar;
+   end;
+   GetNum := Value;
 end;
 {--------------------------------------------------------------}
 { Output a String with Tab }
@@ -88,16 +100,82 @@ begin
    WriteLn;
 end;
 {--------------------------------------------------------------}
-{ Initialize }
-procedure Init;
+{ Parse and Translate a Math Factor }
+function Expression: integer; Forward;
+function Factor:integer;
 begin
-   GetChar;
+   if Look = '(' then
+   begin
+      Match('(');
+      Factor := Expression;
+      Match(')');
+   end
+   else if isAlpha(Look) then
+    Factor := Table[GetName]
+   else
+      Factor := GetNum;
+end;
+{--------------------------------------------------------------}
+{ Parse and Translate a Math Term }
+function Term: integer;
+var Value: integer;
+begin
+   Value := Factor;
+   while Look in ['*', '/'] do begin
+      case Look of
+         '*':
+         begin
+            Match('*');
+            Value := Value * Factor;
+         end;
+         '/':
+         begin
+            Match('/');
+            Value := Value div Factor;
+         end;
+      end;
+   end;
+   Term := Value;
 end;
 {--------------------------------------------------------------}
 { Parse and Translate an Expression }
 function Expression: integer;
+var Value: integer;
 begin
-   Expression := GetNum;
+   if IsAddop(Look) then
+      Value := 0
+   else
+      Value := Term;
+   while IsAddop(Look) do begin
+      case Look of
+         '+': 
+         begin
+            Match('+');
+            Value := Value + Term;
+         end;
+         '-':
+         begin
+            Match('-');
+            Value := Value - Term;
+         end;
+      end;
+   end;
+   Expression := Value;
+end;
+{--------------------------------------------------------------}
+{ Initialize the Variable Area }
+procedure InitTable;
+var i: char;
+begin
+	for i := 'A' to 'Z' do
+		Table[i] := 0;
+end;
+{--------------------------------------------------------------}
+{ Initialize }
+procedure Init;
+begin
+	InitTable;
+	GetChar;
 end;
 {--------------------------------------------------------------}
 
